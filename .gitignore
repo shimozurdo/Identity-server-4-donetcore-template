@@ -1,0 +1,4 @@
+/.vs
+/webapi/appsettings.Development.json
+/webapi/bin
+/webapi/obj

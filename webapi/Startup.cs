@@ -1,6 +1,8 @@
+using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,8 +10,10 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using webapi.Data;
+using webapi.Models;
 
 namespace webapi
 {
@@ -25,16 +29,48 @@ namespace webapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+
+            // uncomment, if you want to add an MVC-based UI
             services.AddControllersWithViews();
-            //var connectionString = Configuration.GetConnectionString("gamerixdbConnection");
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //      options.UseMySql(connectionString));
 
-            services.AddIdentityServer()
-                .AddDeveloperSigningCredential()
-                .AddInMemoryApiResources(Config.GetApiResources())
-                .AddInMemoryClients(Config.GetClients());
+            services.AddDbContext<ApplicationDbContext>(options =>
+                  options.UseMySql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly)));
+            //options.UseMySql(connectionString));
 
+
+            services.AddIdentity<ApplicationUser, ApplicationRole>(config =>
+            {
+                config.Password.RequiredLength = 4;
+                config.Password.RequireDigit = false;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Password.RequireUppercase = false;
+            }).AddEntityFrameworkStores<ApplicationDbContext>()
+               .AddDefaultTokenProviders();
+
+            var builder = services.AddIdentityServer(options =>
+            {
+                options.Events.RaiseErrorEvents = true;
+                options.Events.RaiseInformationEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseSuccessEvents = true;
+                options.UserInteraction.LoginUrl = "/Home/Index";
+                options.UserInteraction.LogoutUrl = "/Home/Index";
+                options.Authentication = new AuthenticationOptions();
+            })
+            .AddConfigurationStore(options =>
+            {
+                options.ConfigureDbContext = b => b.UseMySql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+            })
+            .AddOperationalStore(options =>
+            {
+                options.ConfigureDbContext = b => b.UseMySql(connectionString, sql => sql.MigrationsAssembly(migrationsAssembly));
+                options.EnableTokenCleanup = true;
+            });
+
+            // not recommended for production - you need to store your key material somewhere secure
+            builder.AddDeveloperSigningCredential();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +88,9 @@ namespace webapi
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             app.UseIdentityServer();
+
             app.UseRouting();
 
             app.UseAuthorization();

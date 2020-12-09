@@ -25,14 +25,14 @@ namespace webapi
                     ClientName = "Website client",
 
                     RedirectUris = { "http://localhost:4200/auth-callback" },
-                    PostLogoutRedirectUris = { "http://localhost:4200/" },
+                    PostLogoutRedirectUris = { "http://localhost:4200/", "44545" },
                     ClientSecrets = new List<Secret> { new Secret("secret".Sha256()) },
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = new List<string>() { "webapi"},
                     AllowAccessTokensViaBrowser = true,
 
                     AccessTokenLifetime = 3600,
-                       AllowOfflineAccess = true
+                    AllowOfflineAccess = true
                 },
             };
         }
@@ -41,7 +41,7 @@ namespace webapi
         {
             return new List<ApiResource>
             {
-                new ApiResource("webapi")
+                new ApiResource("webapi", "The Backend")
             };
         }
     }

@@ -2,3 +2,6 @@
 /webapi/appsettings.Development.json
 /webapi/bin
 /webapi/obj
+/webapi/tempkey.jwk
+/webapi/tempkey.rsa
+/webapi/Data/Migrations

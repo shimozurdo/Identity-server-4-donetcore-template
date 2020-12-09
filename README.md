@@ -33,7 +33,9 @@ You should see on this url:
 
 this json:
 
-*It may also be port :5000, depending on the configuration of your project.
+![](https://res.cloudinary.com/shimozurdo/image/upload/v1607555316/markdown/well-known_hsvszh.png)
+
+*It may also be the port :5000, depending on the configuration of your project.
 ### Source
 
 https://deblokt.com/2020/01/24/02-identityserver4-entityframework-net-core-3-1/

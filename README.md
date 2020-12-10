@@ -1,4 +1,4 @@
-# Identity Server 4, .NET Core 3.1 and MySql
+# Identity Server 4, .NET Core 3.1 and MySql or Sql Server
 
 ## Add a connection string in “appsettings.json” 
 
